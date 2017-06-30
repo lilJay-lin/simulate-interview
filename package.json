@@ -1,0 +1,16 @@
+{
+  "name": "simulate-interview",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node debug app.js"
+  },
+  "dependencies": {
+    "concurrency-logger": "^2.0.1",
+    "glob": "^7.1.2",
+    "koa": "^2.2.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-router": "^7.2.0",
+    "mongoose": "^4.10.7",
+    "util": "^0.10.3"
+  }
+}
