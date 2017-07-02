@@ -4,19 +4,28 @@
 const _ = require('lodash')
 const STATUS = require('./status')
 const DATA_VALIDATION_ERROR_NAME = 'ValidationError'
-const NOT_FOUND = 404
+const NORMAL_ERROR_NAME = 'NormalError'
+const REQUEST_NOT_FOUND = 404
+const REQUEST_METHOD_NOT_FOUND = 405
 const SERVER_ERROR = 500
+const REQUEST_SUCCESS = 200
 const ERROR_MESSAGE = '请求异常，请检查'
 const DATA_ERROR_MESSAGE = '数据校验不通过，请检查'
-module.exports = () => {
+
+module.exports.catch = () => {
   return async (cxt, next) => {
     try {
       await next()
-      if (cxt.status === NOT_FOUND) {
+      if (cxt.status === REQUEST_NOT_FOUND) {
         cxt.body = {
           message: 'request no found'
         }
-      } else if (cxt.response.is('json')) {
+      } else if (cxt.status === REQUEST_METHOD_NOT_FOUND) {
+        cxt.body = {
+          message: 'request method no found'
+        }
+      }
+      else if (cxt.response.is('json')) {
         cxt.body.status = STATUS.SUCCESS_STATUS
       }
     } catch (err) {
@@ -41,7 +50,20 @@ module.exports = () => {
           fields
         }
       }
+      /*
+      * 正常业务逻辑抛出来的提示错误
+      * */
+      else if (err.name === NORMAL_ERROR_NAME) {
+        body.message = err.message
+      }
       cxt.body = body
     }
   }
+}
+
+module.exports.getNormalError = (message) => {
+  const error = new Error('权限数据不存在，请检查')
+  error.status = REQUEST_SUCCESS
+  error.name = NORMAL_ERROR_NAME
+  return error
 }

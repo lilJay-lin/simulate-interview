@@ -8,7 +8,11 @@ module.exports = {
   _validateMethod (schema) {
     return (paramObj) => {
       let {path, cb, message} = paramObj
-      schema.path(path).validate(cb(paramObj), message)
+      schema.path(path).validate({
+        isAsync: true,
+        validator: cb(paramObj),
+        message
+      })
     }
   },
   setValidateStrange (schema, cfg) {
@@ -51,8 +55,8 @@ module.exports = {
    * 不为空
    * */
   required () {
-    return (value) => {
-      return !_.isEmpty(value)
+    return (value, done) => {
+      return done(!_.isEmpty(value))
     }
   },
   /*
@@ -112,11 +116,11 @@ module.exports = {
    * 默认值0，表示不需校验
    * */
   checkLen ({min = 0, max = 0}) {
-    return (value) => {
+    return (value, done) => {
       let len = _.isEmpty(value) ? 0 : _.isNumber(value) || _.isString(value) ? ('' + value).length : _.isArray(value) ? value.length : 0
       let gtMin = min <= len
       let ltMax = len <= max
-      return min === 0 ? (max === 0 ? true : ltMax) : (max === 0 ? gtMin : gtMin && ltMax)
+      return done(min === 0 ? (max === 0 ? true : ltMax) : (max === 0 ? gtMin : gtMin && ltMax))
     }
   },
   /*

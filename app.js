@@ -8,7 +8,13 @@ const app = new Koa()
 const router = require('./routes')
 const path = require('path')
 const bodyParser = require('koa-bodyparser')
-const error = require('./error')
+const catchError = require('./error').catch
+const userDao = new (require('./dao/user'))
+
+/*
+ *  异常处理
+ */
+app.use(catchError())
 
 /*
 * 连接数据库
@@ -26,6 +32,21 @@ app.use(mongoose({
     },
     server: {
       poolSize: 5
+    }
+  },
+  async createBaseData () {
+    let user = await userDao.find({loginName: 'liljay'})
+    if (user == null) {
+      userDao.add({
+        userName: '林小杰',
+        loginName: 'liljay',
+        password: '8293526@',
+        description: '系统管理员',
+        status: true,
+        email: 'lin_xjie@foxmail.com'
+      }).catch(err => {
+        console.log('基础数据插入异常：' + err.message)
+      })
     }
   }
 }))
@@ -63,11 +84,6 @@ let logger = createLogger({
   }
 })
 app.use(logger)
-
-/*
-*  异常处理
-*/
-app.use(error())
 
 /*
 app.use(async (ctx, next) => {

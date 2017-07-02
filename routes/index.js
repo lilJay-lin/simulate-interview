@@ -1,22 +1,23 @@
 /**
  * Created by linxiaojie on 2017/6/13.
  */
+const glob = require('glob')
+const path = require('path')
+const files = glob.sync(path.resolve(__dirname, './*.js'))
+const _ = require('lodash')
 const Router = require('koa-router')
 const router = new Router({
-  prefix: '/users'
+  prefix: '/api'
 })
-const UserDao = require('../dao/user')
-
-router.post('/', async (cxt) => {
-  const body = cxt.request.body
-  const user = await UserDao.addUser(body)
-  cxt.body = user
+_.each(files, (file) => {
+  if (file.indexOf('/index.js') === -1) {
+    const name = file
+      .replace(/[^\/]*\//g, '')
+      .replace(/\.js$/g, '')
+      .replace(/\//g, '.')
+      .toLowerCase()
+    router.use('/' + name, require(file).routes())
+  }
 })
-
-router.get('/', async (cxt) => {
-  let list = await UserDao.findUser({userName: {$regex: '林'}})
-  cxt.body = list
-})
-
 
 module.exports = router
