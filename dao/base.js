@@ -28,19 +28,11 @@ class BaseDao {
   }
   async update (queryParam, doc = {}) {
     const model = this.model()
-    /*
-     * 默认更新有效数据
-     * */
-    queryParam.status = queryParam.status === undefined ? true : queryParam.status
     let docs = await model.update(queryParam, doc, { multi: true })
     return docs
   }
   async find (queryParam) {
     const model = this.model()
-    /*
-     * 默认查找有效数据
-     * */
-    queryParam.status = queryParam.status === undefined ? true : queryParam.status
     let docs = await model.find(queryParam)
     return docs
   }
@@ -59,10 +51,6 @@ class BaseDao {
     page = parseInt(page, 10)
     pageSize = parseInt(pageSize, 10)
     const start = (page - 1) * pageSize
-    /*
-    * 默认查找有效数据
-    * */
-    queryParam.status = queryParam.status === undefined ? true : queryParam.status
     let rows = await model.count(queryParam)
     let records = await model.find(queryParam).skip(start).limit(pageSize).populate(populate).sort((sortParam))
     return {
