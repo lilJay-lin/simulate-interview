@@ -3,18 +3,27 @@
  */
 const Router = require('koa-router')
 const router = new Router()
-const PermissionDao = require('../dao/permission')
-const permissionDao = new PermissionDao()
+const RoleDao = require('../dao/role')
+const roleDao = new RoleDao()
 const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
 
-router.param('permission', async (id, cxt, next) => {
+router.param('role', async (id, cxt, next) => {
   const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
-  let permissions = await permissionDao.find({_id: permissionDao.caseObjectId(id), status})
-  if (_.isEmpty(permissions)) {
-    throw getNormalError('权限数据不存在，请检查')
+  let roles = await roleDao.findPopulate({
+    queryParam: {
+      _id: roleDao.caseObjectId(id),
+      status
+    },
+    populate: {
+      path: 'permissions',
+      match: {status: true}
+    }
+  })
+  if (_.isEmpty(roles)) {
+    throw getNormalError('角色数据不存在，请检查')
   }
-  cxt.permission = permissions[0]
+  cxt.role = roles[0]
   return next()
 })
 
@@ -23,32 +32,32 @@ router.param('permission', async (id, cxt, next) => {
 * */
 router.post('/', async (cxt) => {
   const body = cxt.request.body
-  const permission = await permissionDao.add(body)
-  cxt.body = permission
+  const role = await roleDao.add(body)
+  cxt.body = role
 })
 
 /*
  * 删除
  * */
 router.del('/:id', async (cxt) => {
-  const permission = await permissionDao.delete({_id: permissionDao.caseObjectId(cxt.params.id)})
+  const role = await roleDao.delete({_id: roleDao.caseObjectId(cxt.params.id)})
   cxt.body = {}
 })
 
 router.del('/batch/:ids', async (cxt) => {
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
-    return permissionDao.caseObjectId(id)
+    return roleDao.caseObjectId(id)
   })
-  const permission = await permissionDao.delete({_id: {$in: ids}})
+  const role = await roleDao.delete({_id: {$in: ids}})
   cxt.body = {}
 })
 
 /*
 * 修改
 * */
-router.put('/:id', async (cxt) => {
+router.put('/:role', async (cxt) => {
   const body = cxt.request.body
-  const permission = await permissionDao.update({_id: permissionDao.caseObjectId(cxt.params.id)}, body)
+  const role = await roleDao.update({_id: cxt.role._id}, body)
   cxt.body = {}
 })
 
@@ -72,16 +81,16 @@ router.get('/', async (cxt) => {
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}
   }
-  let list = await permissionDao.pageQuery({queryParam})
+  let list = await roleDao.pageQuery({queryParam})
   cxt.body = list
 })
 
 /*
 * 获取详情
 * */
-router.get('/:permission', async (cxt) => {
+router.get('/:role', async (cxt) => {
   cxt.body = {
-    permission: cxt.permission
+    role: cxt.role
   }
 })
 
