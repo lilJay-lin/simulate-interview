@@ -12,11 +12,6 @@ const catchError = require('./error').catch
 const userDao = new (require('./dao/user'))
 
 /*
- *  异常处理
- */
-app.use(catchError())
-
-/*
 * 连接数据库
 * */
 app.use(mongoose({
@@ -84,6 +79,11 @@ let logger = createLogger({
   }
 })
 app.use(logger)
+
+/*
+ *  异常处理
+ */
+app.use(catchError())
 
 /*
 app.use(async (ctx, next) => {
