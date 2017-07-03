@@ -18,10 +18,12 @@ module.exports.catch = () => {
       await next()
       if (cxt.status === REQUEST_NOT_FOUND) {
         cxt.body = {
+          status: STATUS.ERROR_STATUS,
           message: 'request no found'
         }
       } else if (cxt.status === REQUEST_METHOD_NOT_FOUND) {
         cxt.body = {
+          status: STATUS.ERROR_STATUS,
           message: 'request method no found'
         }
       }
