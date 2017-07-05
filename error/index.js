@@ -64,7 +64,7 @@ module.exports.catch = () => {
 }
 
 module.exports.getNormalError = (message) => {
-  const error = new Error('权限数据不存在，请检查')
+  const error = new Error(message)
   error.status = REQUEST_SUCCESS
   error.name = NORMAL_ERROR_NAME
   return error
