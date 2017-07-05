@@ -33,7 +33,7 @@ class BaseDao {
   }
   async find (queryParam) {
     const model = this.model()
-    let docs = await model.find(queryParam)
+    let docs = await model.find(queryParam).exec()
     return docs
   }
   async findPopulate ({queryParam = {}, populate = ''}) {
@@ -56,8 +56,8 @@ class BaseDao {
     page = parseInt(page, 10)
     pageSize = parseInt(pageSize, 10)
     const start = (page - 1) * pageSize
-    let rows = await model.count(queryParam)
-    let records = await model.find(queryParam).skip(start).limit(pageSize).populate(populate).sort((sortParam))
+    let rows = await model.count(queryParam).exec()
+    let records = await model.find(queryParam).skip(start).limit(pageSize).populate(populate).sort((sortParam)).exec()
     return {
       records,
       pageInfo: {
