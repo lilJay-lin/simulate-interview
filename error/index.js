@@ -5,12 +5,14 @@ const _ = require('lodash')
 const STATUS = require('./status')
 const DATA_VALIDATION_ERROR_NAME = 'ValidationError'
 const NORMAL_ERROR_NAME = 'NormalError'
+const UN_AUTHORIZATION = 401
 const REQUEST_NOT_FOUND = 404
 const REQUEST_METHOD_NOT_FOUND = 405
 const SERVER_ERROR = 500
 const REQUEST_SUCCESS = 200
 const ERROR_MESSAGE = '请求异常，请检查'
 const DATA_ERROR_MESSAGE = '数据校验不通过，请检查'
+const UN_AUTHORIZATION_MESSAGE = '请求未认证'
 
 module.exports.catch = () => {
   return async (cxt, next) => {
@@ -36,6 +38,12 @@ module.exports.catch = () => {
       let body = {
         status: STATUS.ERROR_STATUS,
         message: ERROR_MESSAGE
+      }
+      /*
+      * 请求未认证
+      * */
+      if (cxt.status === UN_AUTHORIZATION) {
+        body.message = UN_AUTHORIZATION_MESSAGE
       }
       /*
       * 表单校验错误

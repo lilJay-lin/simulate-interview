@@ -7,6 +7,7 @@ const UserDao = require('../dao/user')
 const userDao = new UserDao()
 const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
+const useAuthor = require('../authorization')
 
 router.param('user', async (id, cxt, next) => {
   const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
@@ -29,6 +30,36 @@ router.param('user', async (id, cxt, next) => {
   }
   cxt.user = users[0]
   return next()
+})
+
+/*
+* 登录
+* */
+router.post('/login', async (cxt) => {
+  const {loginName, password} = cxt.request.body || {loginName: '', password: ''}
+  const message = '用户名或密码不正确'
+  if (!loginName || !password) {
+    throw getNormalError('登录用户名和密码不能为空')
+  }
+  let users = await userDao.find({loginName})
+  if (users.length === 0) {
+    throw getNormalError(message)
+  }
+  let user = users[0]
+  let check = await user.comparePassword(password)
+  if (check) {
+    let token = await useAuthor.sign({
+      loginName: user.loginName,
+      loginTime: Date.now(),
+      userName: user.userName
+    })
+    cxt.body = {
+      token,
+      message: '登录成功'
+    }
+  } else {
+    throw getNormalError(message)
+  }
 })
 
 /*
@@ -94,9 +125,10 @@ router.get('/', async (cxt) => {
  * */
 router.get('/:user', async (cxt) => {
   /*
-  * 密码隐藏不显示
+  * 密码、盐值隐藏不显示
   * */
   cxt.user.password = ''
+  cxt.user.salt = ''
   cxt.body = {
     user: cxt.user
   }

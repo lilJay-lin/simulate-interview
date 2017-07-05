@@ -19,18 +19,22 @@ const UserSchema = new Schema({
 /*
  * 密码匹配
  * */
-/*UserSchema.methods.comparePassword = function (password, cb) {
- if (!password || !this.password) {
- cb(false)
- }
-
- bcrypt.compare(password, this.password, (err, isMatch) => {
- if (err) {
- return cb(err)
- }
- cb(isMatch)
- })
- }*/
+const SHA = 'SHA256'
+const LITERAL = 2
+const LENGTH = 256
+UserSchema.methods.comparePassword = function (password) {
+  return new Promise((res, rej) => {
+    if (!password || !this.password || !this.salt) {
+      res(false)
+    }
+    crypto.pbkdf2(password, this.salt, LITERAL, LENGTH, SHA, (err, key) => {
+      if (err) {
+        throw err
+      }
+      res(this.password === key.toString('hex'))
+    })
+  })
+}
 
 /*
  * 数据校验
@@ -93,7 +97,7 @@ UserSchema.pre('save', function (next) {
       return next(err)
     }
     let salt = new Buffer(buf).toString('hex')
-    crypto.pbkdf2('8293526', salt, 2, 256, 'SHA256', (err, key) => {
+    crypto.pbkdf2(user.password, salt, LITERAL, LENGTH, SHA, (err, key) => {
       if (err) {
         return next(err)
       }

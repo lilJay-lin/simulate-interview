@@ -10,6 +10,7 @@ const path = require('path')
 const bodyParser = require('koa-bodyparser')
 const catchError = require('./error').catch
 const userDao = new (require('./dao/user'))
+const userAuthor = require('./authorization').userAuthor
 
 /*
 * 连接数据库
@@ -86,13 +87,9 @@ app.use(logger)
 app.use(catchError())
 
 /*
-app.use(async (ctx, next) => {
-  const start = Date.now()
-  await next()
-  const ms = Date.now() - start
-  ctx.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
-*/
+* 授权认证
+* */
+app.use(userAuthor())
 
 app.use(router.routes())
    .use(router.allowedMethods())

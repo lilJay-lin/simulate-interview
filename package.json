@@ -5,13 +5,17 @@
     "start": "node debug app.js"
   },
   "dependencies": {
+    "bson": "^1.0.4",
     "concurrency-logger": "^2.0.1",
     "glob": "^7.1.2",
+    "jsonwebtoken": "^7.4.1",
     "koa": "^2.2.0",
     "koa-bodyparser": "^4.2.0",
+    "koa-jwt": "^3.2.2",
     "koa-router": "^7.2.0",
     "lodash": "4.17.4",
     "mongoose": "^4.10.7",
+    "require_optional": "^1.0.1",
     "util": "^0.10.3"
   }
 }
