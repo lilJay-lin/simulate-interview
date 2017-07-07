@@ -63,6 +63,18 @@ router.post('/login', async (cxt) => {
 })
 
 /*
+* 注销
+* */
+router.get('/logout', async (cxt) => {
+  let status = await useAuthor.revoked(cxt.state.token)
+  if (!status) {
+    throw new Error('注销失败，请重试')
+  }
+  cxt.body = {message: '注销成功'}
+})
+
+
+/*
  * 增加
  * */
 router.post('/', async (cxt) => {

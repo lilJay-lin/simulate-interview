@@ -11,6 +11,7 @@ const bodyParser = require('koa-bodyparser')
 const catchError = require('./error').catch
 const userDao = new (require('./dao/user'))
 const userAuthor = require('./authorization').userAuthor
+const redis = require('./redis')
 
 /*
 * 连接数据库
@@ -46,6 +47,11 @@ app.use(mongoose({
     }
   }
 }))
+
+/*
+* 链接redis
+* */
+app.use(redis())
 
 /*
 * 请求数据转换

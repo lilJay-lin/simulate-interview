@@ -6,6 +6,7 @@ const jsonWebToken = require('jsonwebtoken')
 const SECRET = 'simulate-interview-liljay-secret'
 const TOKEN_KEY = 'token'
 const unlessPaths = [/^\/api\/users\/login/]
+const redis = require('../redis')
 
 module.exports.userAuthor = () => {
   return jwt({
@@ -19,15 +20,33 @@ module.exports.userAuthor = () => {
      * token 是否失效
      * */
     isRevoked (cxt, decodeToken, token) {
-      return false
+      return redis.get(token).then((val) => {
+        return val !== null
+      }).catch((err) => {
+        cxt.log(err)
+        return true
+      })
     },
-    debug: false
+    debug: true
   }).unless({path: unlessPaths})
+}
+
+module.exports.revoked = (token) => {
+  return redis.set(token, '1')
 }
 
 module.exports.sign = (payload = {}) => {
   return new Promise((resolve, reject) => {
-    payload.iat = Math.floor(Date.now() / 1000) - 30
+    const now = Math.floor(Date.now() / 1000)
+    /*
+    * timestamp
+    * */
+    payload.iat = now - 30
+    /*
+    * expire time
+    * 半个钟有效
+    * */
+    payload.exp = now + 60 * 60 / 2
     jsonWebToken.sign(payload, SECRET,  {algorithm: 'HS256'}, function (err, token) {
       if (err) {
         reject(err)

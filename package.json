@@ -17,5 +17,8 @@
     "mongoose": "^4.10.7",
     "require_optional": "^1.0.1",
     "util": "^0.10.3"
+  },
+  "devDependencies": {
+    "redis": "^2.7.1"
   }
 }
