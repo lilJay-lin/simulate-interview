@@ -7,6 +7,7 @@
   "dependencies": {
     "bson": "^1.0.4",
     "co-wechat": "^2.0.0",
+    "co-wechat-api": "^3.1.0",
     "concurrency-logger": "^2.0.1",
     "glob": "^7.1.2",
     "jsonwebtoken": "^7.4.1",
