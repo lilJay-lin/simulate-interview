@@ -12,6 +12,7 @@ const catchError = require('./error').catch
 const userDao = new (require('./dao/user'))
 const userAuthor = require('./authorization').userAuthor
 const redis = require('./redis')
+const server = require('koa-static')
 
 /*
 * 连接数据库
@@ -91,6 +92,11 @@ app.use(logger)
  *  异常处理
  */
 app.use(catchError())
+
+/*
+* 静态服务器
+* */
+app.use(server(__dirname + '/static'))
 
 /*
 * 授权认证

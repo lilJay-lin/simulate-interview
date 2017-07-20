@@ -21,5 +21,15 @@ router.post('/', api.wechat.middleware(async (message) => {
 /*
 *
 * */
+router.post('/ticket', async (cxt) => {
+  let {url = '', jsApiList = [], debug = true} = cxt.request.body
+  let config = await api.getJsConfig({
+    debug,
+    url,
+    jsApiList
+  })
+  config.debug = config.debug === 'false' ? false : true
+  cxt.body = config
+})
 
 module.exports = router
