@@ -51,7 +51,8 @@ router.post('/login', async (cxt) => {
     let token = await useAuthor.sign({
       loginName: user.loginName,
       loginTime: Date.now(),
-      userName: user.userName
+      userName: user.userName,
+      id: user._id
     })
     cxt.body = {
       token,
@@ -73,6 +74,36 @@ router.get('/logout', async (cxt) => {
   cxt.body = {message: '注销成功'}
 })
 
+
+/*
+ * 获取当前登录用户详情
+ * */
+router.get('/info', async (cxt) => {
+  let users = await userDao.findPopulate({
+    queryParam: {
+      _id: userDao.caseObjectId(cxt.state.user.id)
+    },
+    populate: {
+      path: 'roles',
+      match: {status: true},
+      /*      populate: {
+       path: 'permissions',
+       match: {status: true}
+       }*/
+    }
+  })
+  let user = users[0]
+  /*
+   * 密码、盐值隐藏不显示
+   * */
+  if (user) {
+    user.password = ''
+    user.salt = ''
+  }
+  cxt.body = {
+    user
+  }
+})
 
 /*
  * 增加
@@ -122,13 +153,14 @@ router.put('/batch/:ids', async (cxt) => {
  * */
 router.get('/', async (cxt) => {
   const queryParam = {}
-  const name = cxt.query['name']
-  const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
+  const query = cxt.query
+  const name = query['name']
+  const status = query['status'] === false || query['status'] === 'false' ? false : true
   queryParam.status = status
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}
   }
-  let list = await userDao.pageQuery({queryParam})
+  let list = await userDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
   cxt.body = list
 })
 
@@ -145,6 +177,5 @@ router.get('/:user', async (cxt) => {
     user: cxt.user
   }
 })
-
 
 module.exports = router

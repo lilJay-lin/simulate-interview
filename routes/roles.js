@@ -75,13 +75,14 @@ router.put('/batch/:ids', async (cxt) => {
 * */
 router.get('/', async (cxt) => {
   const queryParam = {}
-  const name = cxt.query['name']
-  const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
+  const query = cxt.query
+  const name = query['name']
+  const status = query['status'] === false || query['status'] === 'false' ? false : true
   queryParam.status = status
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}
   }
-  let list = await roleDao.pageQuery({queryParam})
+  let list = await roleDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
   cxt.body = list
 })
 

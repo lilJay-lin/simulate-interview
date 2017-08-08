@@ -28,6 +28,9 @@ class BaseDao {
   }
   async update (queryParam, doc = {}) {
     const model = this.model()
+    if (doc._id) {
+      delete doc._id
+    }
     let docs = await model.update(queryParam, doc, { multi: true })
     return docs
   }
@@ -62,6 +65,7 @@ class BaseDao {
       records,
       pageInfo: {
         currentPage: page,
+        pageSize,
         totalRow: rows,
         totalPage: Math.floor((rows - 1) / pageSize) + 1
       }
