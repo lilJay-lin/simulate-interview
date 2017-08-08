@@ -10,7 +10,8 @@ const UserSchema = new Schema({
   userName: String,
   loginName: String,
   password: String,
-  description: String,
+  avatar: String,
+  introduction: String,
   status: {type: Boolean, default: true},
   email: String,
   salt: String,
@@ -45,6 +46,11 @@ dbValidate.setValidateStrange(UserSchema, {
     {
       method: 'required',
       message: '密码不能为空',
+    },
+    {
+      method: 'checkLen',
+      min: 6,
+      message: '密码长度不能小于6位'
     }
   ],
   loginName: [
