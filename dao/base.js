@@ -23,7 +23,7 @@ class BaseDao {
   }
   async delete (queryParam) {
     const model = this.model()
-    let docs = await model.update(queryParam, {$set: {status: false}}, { multi: true })
+    let docs = await model.update(queryParam, {$set: {status: false}}, { multi: true }).exec()
     return docs
   }
   async update (queryParam, doc = {}) {
@@ -31,7 +31,7 @@ class BaseDao {
     if (doc._id) {
       delete doc._id
     }
-    let docs = await model.update(queryParam, doc, { multi: true })
+    let docs = await model.update(queryParam, doc, { multi: true }).exec()
     return docs
   }
   async find (queryParam) {
@@ -41,7 +41,7 @@ class BaseDao {
   }
   async findPopulate ({queryParam = {}, populate = ''}) {
     const model = this.model()
-    let docs = await model.find(queryParam).populate(populate)
+    let docs = await model.find(queryParam).populate(populate).exec()
     return docs
   }
   async pageQuery ({page = 1, pageSize = 10, populate = '', queryParam = {}, sortParam = '-createdAt'}) {
