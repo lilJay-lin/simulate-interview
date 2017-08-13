@@ -9,10 +9,10 @@ const router = require('./routes')
 const path = require('path')
 const bodyParser = require('koa-bodyparser')
 const catchError = require('./error').catch
-const userDao = new (require('./dao/user'))
 const userAuthor = require('./authorization').userAuthor
 const redis = require('./redis')
 const server = require('koa-static')
+const initData = require('./initData')
 
 /*
 * 连接数据库
@@ -32,21 +32,7 @@ app.use(mongoose({
       poolSize: 5
     }
   },
-  async createBaseData () {
-    let user = await userDao.find({loginName: 'liljay'})
-    if (user == null) {
-      userDao.add({
-        userName: '林小杰',
-        loginName: 'liljay',
-        password: '8293526@',
-        description: '系统管理员',
-        status: true,
-        email: 'lin_xjie@foxmail.com'
-      }).catch(err => {
-        console.log('基础数据插入异常：' + err.message)
-      })
-    }
-  }
+  initData
 }))
 
 /*

@@ -68,7 +68,7 @@ middleware.open = (db, options) => {
   db.once('open', function() {
     // we're connected!
     console.log('mongodb is connected')
-    options.createBaseData && options.createBaseData(middleware)
+    options.initData && options.initData(middleware)
   });
 
   db.open(options.host, middleware.database, options.port, options.opt)
