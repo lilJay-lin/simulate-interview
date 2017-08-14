@@ -23,7 +23,7 @@ class BaseDao {
   }
   async delete (queryParam) {
     const model = this.model()
-    let docs = await model.update(queryParam, {$set: {status: false}}, { multi: true }).exec()
+    let docs = await model.update(queryParam, {$set: {status: '0'}}, { multi: true }).exec()
     return docs
   }
   async update (queryParam, doc = {}) {

@@ -8,8 +8,15 @@ const PermissionSchema = new Schema({
     name: String,
     code: String,
     description: String,
-    status: {type: Boolean, default: true}
+    status: {type: String, default: '1'}
 },{timestamps: true})
+
+if (!PermissionSchema.options.toObject) PermissionSchema.options.toObject = {};
+PermissionSchema.options.toObject.transform = (doc, ret, options) => {
+  ret.createdAt = moment(ret.createdAt).format("YYYY-MM-DD HH:mm:ss")
+  ret.updatedAt = moment(ret.updatedAt).format("YYYY-MM-DD HH:mm:ss")
+  return ret
+}
 
 dbValidate.setValidateStrange(PermissionSchema, {
     name: [

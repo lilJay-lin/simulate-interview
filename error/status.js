@@ -14,3 +14,8 @@ module.exports.ERROR_STATUS = 2
  * 数据校验失败
  * */
 module.exports.DATA_ERROR_STATUS = 3
+
+/*
+  未登录
+ */
+module.exports.UN_LOGIN = 4

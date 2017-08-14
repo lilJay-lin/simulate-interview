@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const dbValidate = require('../mongoose/validate')
 const crypto = require('crypto')
+const moment = require('moment')
 
 const UserSchema = new Schema({
   userName: String,
@@ -12,11 +13,21 @@ const UserSchema = new Schema({
   password: String,
   avatar: String,
   introduction: String,
-  status: {type: Boolean, default: true},
+  status: {type: String, default: '1'},
   email: String,
   salt: String,
   roles: [{type: Schema.Types.ObjectId, ref: 'role'}]
 },{timestamps: true})
+
+if (!UserSchema.options.toObject) UserSchema.options.toObject = {};
+UserSchema.options.toObject.transform = (doc, ret, options) => {
+  delete ret.password
+  delete ret.salt
+  ret.createdAt = moment(ret.createdAt).format("YYYY-MM-DD HH:mm:ss")
+  ret.updatedAt = moment(ret.updatedAt).format("YYYY-MM-DD HH:mm:ss")
+  return ret
+}
+
 /*
  * 密码匹配
  * */

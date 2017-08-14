@@ -9,7 +9,7 @@ const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
 
 router.param('role', async (id, cxt, next) => {
-  const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
+  const status = cxt.query['status'] == 0 ? 0 : 1
   let roles = await roleDao.findPopulate({
     queryParam: {
       _id: roleDao.caseObjectId(id),
@@ -77,7 +77,7 @@ router.get('/', async (cxt) => {
   const queryParam = {}
   const query = cxt.query
   const name = query['name']
-  const status = query['status'] === false || query['status'] === 'false' ? false : true
+  const status = query['status'] == 0 ? 0 : 1
   queryParam.status = status
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}

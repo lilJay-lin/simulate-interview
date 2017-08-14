@@ -8,9 +8,16 @@ const dbValidate = require('../mongoose/validate')
 const RoleSchema = new Schema({
     name: String,
     description: String,
-    status: {type: Boolean, default: true},
+    status: {type: String, default: '1'},
     permissions: [{type: Schema.Types.ObjectId, ref: 'permission'}]
 },{timestamps: true})
+
+if (!RoleSchema.options.toObject) RoleSchema.options.toObject = {};
+RoleSchema.options.toObject.transform = (doc, ret, options) => {
+  ret.createdAt = moment(ret.createdAt).format("YYYY-MM-DD HH:mm:ss")
+  ret.updatedAt = moment(ret.updatedAt).format("YYYY-MM-DD HH:mm:ss")
+  return ret
+}
 
 /*
 * 表校验

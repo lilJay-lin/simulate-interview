@@ -9,7 +9,7 @@ const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
 
 router.param('permission', async (id, cxt, next) => {
-  const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
+  const status = cxt.query['status'] == 0 ? 0 : 1
   let permissions = await permissionDao.find({_id: permissionDao.caseObjectId(id), status})
   if (_.isEmpty(permissions)) {
     throw getNormalError('权限数据不存在，请检查')
@@ -68,7 +68,7 @@ router.get('/', async (cxt) => {
   const queryParam = {}
   const query = cxt.query
   const name = query['name']
-  const status = query['status'] === false || query['status'] === 'false' ? false : true
+  const status = query['status'] == 0 ? 0 : 1
   queryParam.status = status
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}

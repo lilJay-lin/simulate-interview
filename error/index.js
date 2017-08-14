@@ -12,7 +12,7 @@ const SERVER_ERROR = 500
 const REQUEST_SUCCESS = 200
 const ERROR_MESSAGE = '请求异常，请检查'
 const DATA_ERROR_MESSAGE = '数据校验不通过，请检查'
-const UN_AUTHORIZATION_MESSAGE = '请先登录'
+const UN_LOGIN_MESSAGE = '请先登录'
 
 module.exports.catch = () => {
   return async (cxt, next) => {
@@ -43,7 +43,11 @@ module.exports.catch = () => {
       * 请求未认证
       * */
       if (cxt.status === UN_AUTHORIZATION) {
-        body.message = UN_AUTHORIZATION_MESSAGE
+        cxt.status = REQUEST_SUCCESS
+        body = {
+          status: STATUS.UN_LOGIN,
+          message: UN_LOGIN_MESSAGE
+        }
       }
       /*
       * 表单校验错误

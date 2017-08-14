@@ -10,7 +10,7 @@ const _ = require('lodash')
 const useAuthor = require('../authorization')
 
 router.param('user', async (id, cxt, next) => {
-  const status = cxt.query['status'] === false || cxt.query['status'] === 'false' ? false : true
+  const status = cxt.query['status'] == 0 ? 0 : 1
   let users = await userDao.findPopulate({
     queryParam: {
       _id: userDao.caseObjectId(id),
@@ -28,7 +28,7 @@ router.param('user', async (id, cxt, next) => {
   if (_.isEmpty(users)) {
     throw getNormalError('用户数据不存在，请检查')
   }
-  cxt.user = users[0]
+  cxt.user = users[0].toObject()
   return next()
 })
 
@@ -92,16 +92,16 @@ router.get('/info', async (cxt) => {
        }*/
     }
   })
-  let user = users[0]
+/*  let user = users[0]*/
   /*
    * 密码、盐值隐藏不显示
    * */
-  if (user) {
+/*  if (user) {
     user.password = ''
     user.salt = ''
-  }
+  }*/
   cxt.body = {
-    user
+    user: users[0].toObject()
   }
 })
 
@@ -155,7 +155,7 @@ router.get('/', async (cxt) => {
   const queryParam = {}
   const query = cxt.query
   const name = query['name']
-  const status = query['status'] === false || query['status'] === 'false' ? false : true
+  const status = query['status'] == 0 ? 0 : 1
   queryParam.status = status
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}
@@ -171,8 +171,8 @@ router.get('/:user', async (cxt) => {
   /*
   * 密码、盐值隐藏不显示
   * */
-  cxt.user.password = ''
-  cxt.user.salt = ''
+/*  cxt.user.password = ''
+  cxt.user.salt = ''*/
   cxt.body = {
     user: cxt.user
   }

@@ -11,9 +11,7 @@ class UserDao extends BaseDao {
   async pageQuery (param) {
     let pages = await super.pageQuery(param)
     pages.records = _.map(pages.records, (user) => {
-      user.password = ''
-      user.salt = ''
-      return user
+      return user.toObject()
     })
     return pages
   }
