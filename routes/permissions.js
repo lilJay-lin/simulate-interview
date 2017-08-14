@@ -24,22 +24,18 @@ router.param('permission', async (id, cxt, next) => {
 router.post('/', async (cxt) => {
   const body = cxt.request.body
   const permission = await permissionDao.add(body)
-  cxt.body = permission
+  cxt.body = {}
 })
 
 /*
  * 删除
  * */
-router.del('/:id', async (cxt) => {
-  const permission = await permissionDao.delete({_id: permissionDao.caseObjectId(cxt.params.id)})
-  cxt.body = {}
-})
-
 router.del('/batch/:ids', async (cxt) => {
+  const body = cxt.request.body
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
     return permissionDao.caseObjectId(id)
   })
-  const permission = await permissionDao.delete({_id: {$in: ids}})
+  const permission = await permissionDao.batch({_id: {$in: ids}}, body)
   cxt.body = {}
 })
 
@@ -55,9 +51,9 @@ router.put('/:id', async (cxt) => {
 router.put('/batch/:ids', async (cxt) => {
   const body = cxt.request.body
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
-    return roleDao.caseObjectId(id)
+    return permissionDao.caseObjectId(id)
   })
-  const role = await roleDao.update({_id: {$in: ids}}, body)
+  const role = await permissionDao.update({_id: {$in: ids}}, body)
   cxt.body = {}
 })
 

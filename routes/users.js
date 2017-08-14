@@ -18,7 +18,7 @@ router.param('user', async (id, cxt, next) => {
     },
     populate: {
       path: 'roles',
-      match: {status: true},
+      match: {status: '1'},
       /*      populate: {
        path: 'permissions',
        match: {status: true}
@@ -111,22 +111,19 @@ router.get('/info', async (cxt) => {
 router.post('/', async (cxt) => {
   const body = cxt.request.body
   const user = await userDao.add(body)
-  cxt.body = user
+  cxt.body = {}
 })
 
 /*
  * 删除
  * */
-router.del('/:id', async (cxt) => {
-  const user = await userDao.delete({_id: userDao.caseObjectId(cxt.params.id)})
-  cxt.body = {}
-})
 
 router.del('/batch/:ids', async (cxt) => {
+  const body = cxt.request.body
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
     return userDao.caseObjectId(id)
   })
-  const user = await userDao.delete({_id: {$in: ids}})
+  const user = await userDao.batch({_id: {$in: ids}}, body)
   cxt.body = {}
 })
 

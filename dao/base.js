@@ -17,13 +17,14 @@ class BaseDao {
     return mongoose.mongoose.Types.ObjectId(_.padEnd(id, 12, 'x'))
   }
   async add (entity) {
+    delete entity._id
     const doc = this.document(entity)
     await doc.save()
     return doc
   }
-  async delete (queryParam) {
+  async batch (queryParam, set = {}) {
     const model = this.model()
-    let docs = await model.update(queryParam, {$set: {status: '0'}}, { multi: true }).exec()
+    let docs = await model.update(queryParam, {$set: set}, { multi: true }).exec()
     return docs
   }
   async update (queryParam, doc = {}) {

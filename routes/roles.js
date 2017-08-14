@@ -17,7 +17,7 @@ router.param('role', async (id, cxt, next) => {
     },
     populate: {
       path: 'permissions',
-      match: {status: true}
+      match: {status: '1'}
     }
   })
   if (_.isEmpty(roles)) {
@@ -33,22 +33,19 @@ router.param('role', async (id, cxt, next) => {
 router.post('/', async (cxt) => {
   const body = cxt.request.body
   const role = await roleDao.add(body)
-  cxt.body = role
+  cxt.body = {}
 })
 
 /*
  * 删除
  * */
-router.del('/:id', async (cxt) => {
-  const role = await roleDao.delete({_id: roleDao.caseObjectId(cxt.params.id)})
-  cxt.body = {}
-})
 
 router.del('/batch/:ids', async (cxt) => {
+  const body = cxt.request.body
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
     return roleDao.caseObjectId(id)
   })
-  const role = await roleDao.delete({_id: {$in: ids}})
+  const role = await roleDao.batch({_id: {$in: ids}}, body)
   cxt.body = {}
 })
 
