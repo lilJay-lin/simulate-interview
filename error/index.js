@@ -28,8 +28,7 @@ module.exports.catch = () => {
           status: STATUS.ERROR_STATUS,
           message: 'request method no found'
         }
-      }
-      else if (cxt.response.is('json')) {
+      } else if (cxt.response.is('json') || cxt.response.is('json') === 'json') {
         cxt.body.status = STATUS.SUCCESS_STATUS
       }
     } catch (err) {
@@ -43,7 +42,6 @@ module.exports.catch = () => {
       * 请求未认证
       * */
       if (cxt.status === UN_AUTHORIZATION) {
-        cxt.status = REQUEST_SUCCESS
         body = {
           status: STATUS.UN_LOGIN,
           message: UN_LOGIN_MESSAGE
@@ -70,7 +68,9 @@ module.exports.catch = () => {
       else if (err.name === NORMAL_ERROR_NAME) {
         body.message = err.message
       }
+      cxt.status = REQUEST_SUCCESS
       cxt.body = body
+      
     }
   }
 }
