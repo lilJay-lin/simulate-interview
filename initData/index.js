@@ -23,9 +23,8 @@ module.exports = async createBaseData => {
         loginName: 'liljay',
         password: '8293526@',
         description: '系统管理员',
-        status: true,
         email: 'lin_xjie@foxmail.com',
-        role: [role._id]
+        roles: [role._id]
       })
     }
   } catch (e) {

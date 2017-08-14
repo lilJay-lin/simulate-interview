@@ -23,7 +23,7 @@ router.param('role', async (id, cxt, next) => {
   if (_.isEmpty(roles)) {
     throw getNormalError('角色数据不存在，请检查')
   }
-  cxt.role = roles[0]
+  cxt.role = roles[0].toObject()
   return next()
 })
 

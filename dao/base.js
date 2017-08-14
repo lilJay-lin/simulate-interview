@@ -61,6 +61,9 @@ class BaseDao {
     const start = (page - 1) * pageSize
     let rows = await model.count(queryParam).exec()
     let records = await model.find(queryParam).skip(start).limit(pageSize).populate(populate).sort((sortParam)).exec()
+    records = _.map(records, (record) => {
+      return record.toObject()
+    })
     return {
       records,
       pageInfo: {
