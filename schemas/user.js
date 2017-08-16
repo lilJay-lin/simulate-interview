@@ -87,17 +87,17 @@ dbValidate.setValidateStrange(UserSchema, {
   userName:[
     {
       method: 'required',
-      message: '用户名不能为空',
+      message: '昵称不能为空',
     },
     {
       method: 'unique',
-      message: '用户名已经存在'
+      message: '昵称已经存在'
     },
     {
       method: 'checkLen',
       min: 2,
       max: 10,
-      message: '用户名称长度2到10位'
+      message: '昵称长度2到10位'
     }
   ],
 })

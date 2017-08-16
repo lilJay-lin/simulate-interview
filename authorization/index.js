@@ -5,7 +5,7 @@ const jwt = require('koa-jwt')
 const jsonWebToken = require('jsonwebtoken')
 const SECRET = 'simulate-interview-liljay-secret'
 const TOKEN_KEY = 'token'
-const unlessPaths = [/^\/api\/users\/login/, /^\/api\/wx/]
+const unlessPaths = [/^static/, /^\/api\/users\/login/, /^\/api\/wx/]
 const redis = require('../redis')
 
 module.exports.userAuthor = () => {
