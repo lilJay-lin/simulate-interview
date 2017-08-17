@@ -37,11 +37,17 @@ class BaseDao {
   }
   async find (queryParam) {
     const model = this.model()
+    if (queryParam.status === undefined) {
+      queryParam.status = '1'
+    }
     let docs = await model.find(queryParam).exec()
     return docs
   }
   async findPopulate ({queryParam = {}, populate = ''}) {
     const model = this.model()
+    if (queryParam.status === undefined) {
+      queryParam.status = '1'
+    }
     let docs = await model.find(queryParam).populate(populate).exec()
     return docs
   }

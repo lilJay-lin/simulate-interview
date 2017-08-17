@@ -48,12 +48,12 @@ router.post('/login', async (cxt) => {
   let user = users[0]
   let check = await user.comparePassword(password)
   if (check) {
-    let token = await useAuthor.sign({
-      loginName: user.loginName,
-      loginTime: Date.now(),
-      userName: user.userName,
-      id: user._id
-    })
+    let payload = await userDao.getFullUserWithPermission(user._id)
+    /*
+    * 不保存角色
+    * */
+    delete payload.roles
+    let token = await useAuthor.sign(payload)
     cxt.body = {
       token,
       message: '登录成功'
@@ -79,29 +79,9 @@ router.get('/logout', async (cxt) => {
  * 获取当前登录用户详情
  * */
 router.get('/info', async (cxt) => {
-  let users = await userDao.findPopulate({
-    queryParam: {
-      _id: userDao.caseObjectId(cxt.state.user.id)
-    },
-    populate: {
-      path: 'roles',
-      match: {status: true},
-      /*      populate: {
-       path: 'permissions',
-       match: {status: true}
-       }*/
-    }
-  })
-/*  let user = users[0]*/
-  /*
-   * 密码、盐值隐藏不显示
-   * */
-/*  if (user) {
-    user.password = ''
-    user.salt = ''
-  }*/
+  let user = await userDao.getFullUserWithPermission(userDao.caseObjectId(cxt.state.user._id))
   cxt.body = {
-    user: users[0].toObject()
+    user
   }
 })
 
