@@ -7,6 +7,8 @@ const PermissionDao = require('../dao/permission')
 const permissionDao = new PermissionDao()
 const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
+const auth = require('../authorization/req_auth').auth
+const CODES = require('../authorization/req_auth').CODES
 
 router.param('permission', async (id, cxt, next) => {
   const status = cxt.query['status'] == 0 ? 0 : 1
@@ -17,6 +19,38 @@ router.param('permission', async (id, cxt, next) => {
   cxt.permission = permissions[0]
   return next()
 })
+
+
+
+/*
+ * 搜索
+ * */
+router.get('/', async (cxt) => {
+  const queryParam = {}
+  const query = cxt.query
+  const name = query['name']
+  const status = query['status'] == 0 ? 0 : 1
+  queryParam.status = status
+  if (name !== undefined) {
+    queryParam.name = {$regex: decodeURIComponent(name)}
+  }
+  let list = await permissionDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
+  cxt.body = list
+})
+
+/*
+ * 获取详情
+ * */
+router.get('/:permission', async (cxt) => {
+  cxt.body = {
+    permission: cxt.permission
+  }
+})
+
+/*
+* 非查询功能权限限制
+* */
+router.use(auth([CODES.managePermission]))
 
 /*
 * 增加
@@ -55,31 +89,6 @@ router.put('/batch/:ids', async (cxt) => {
   })
   const role = await permissionDao.update({_id: {$in: ids}}, body)
   cxt.body = {}
-})
-
-/*
-* 搜索
-* */
-router.get('/', async (cxt) => {
-  const queryParam = {}
-  const query = cxt.query
-  const name = query['name']
-  const status = query['status'] == 0 ? 0 : 1
-  queryParam.status = status
-  if (name !== undefined) {
-    queryParam.name = {$regex: decodeURIComponent(name)}
-  }
-  let list = await permissionDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
-  cxt.body = list
-})
-
-/*
-* 获取详情
-* */
-router.get('/:permission', async (cxt) => {
-  cxt.body = {
-    permission: cxt.permission
-  }
 })
 
 

@@ -8,6 +8,8 @@ const userDao = new UserDao()
 const getNormalError = require('../error').getNormalError
 const _ = require('lodash')
 const useAuthor = require('../authorization')
+const auth = require('../authorization/req_auth').auth
+const CODES = require('../authorization/req_auth').CODES
 
 router.param('user', async (id, cxt, next) => {
   const status = cxt.query['status'] == 0 ? 0 : 1
@@ -74,7 +76,6 @@ router.get('/logout', async (cxt) => {
   cxt.body = {message: '注销成功'}
 })
 
-
 /*
  * 获取当前登录用户详情
  * */
@@ -84,6 +85,42 @@ router.get('/info', async (cxt) => {
     user
   }
 })
+
+
+/*
+ * 搜索
+ * */
+router.get('/', async (cxt) => {
+  const queryParam = {}
+  const query = cxt.query
+  const name = query['name']
+  const status = query['status'] == 0 ? 0 : 1
+  queryParam.status = status
+  if (name !== undefined) {
+    queryParam.name = {$regex: decodeURIComponent(name)}
+  }
+  let list = await userDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
+  cxt.body = list
+})
+
+/*
+ * 获取详情
+ * */
+router.get('/:user', async (cxt) => {
+  /*
+   * 密码、盐值隐藏不显示
+   * */
+  /*  cxt.user.password = ''
+   cxt.user.salt = ''*/
+  cxt.body = {
+    user: cxt.user
+  }
+})
+
+/*
+ * 非查询功能权限限制
+ * */
+router.use(auth([CODES.manageUser]))
 
 /*
  * 增加
@@ -112,6 +149,11 @@ router.del('/batch/:ids', async (cxt) => {
  * */
 router.put('/:user', async (cxt) => {
   const body = cxt.request.body
+  /*
+  * 防止被更新覆盖，密码修改通过另一个单独接口做修改，只能本人做修改
+  * */
+  delete body.password
+  delete body.salt
   const user = await userDao.update({_id: cxt.user._id}, body)
   cxt.body = {}
 })
@@ -123,36 +165,6 @@ router.put('/batch/:ids', async (cxt) => {
   })
   const user = await userDao.update({_id: {$in: ids}}, body)
   cxt.body = {}
-})
-
-/*
- * 搜索
- * */
-router.get('/', async (cxt) => {
-  const queryParam = {}
-  const query = cxt.query
-  const name = query['name']
-  const status = query['status'] == 0 ? 0 : 1
-  queryParam.status = status
-  if (name !== undefined) {
-    queryParam.name = {$regex: decodeURIComponent(name)}
-  }
-  let list = await userDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
-  cxt.body = list
-})
-
-/*
- * 获取详情
- * */
-router.get('/:user', async (cxt) => {
-  /*
-  * 密码、盐值隐藏不显示
-  * */
-/*  cxt.user.password = ''
-  cxt.user.salt = ''*/
-  cxt.body = {
-    user: cxt.user
-  }
 })
 
 module.exports = router
