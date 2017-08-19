@@ -160,6 +160,11 @@ router.put('/:user', async (cxt) => {
 
 router.put('/batch/:ids', async (cxt) => {
   const body = cxt.request.body
+  /*
+   * 防止被更新覆盖，密码修改通过另一个单独接口做修改，只能本人做修改
+   * */
+  delete body.password
+  delete body.salt
   let ids = _.map((cxt.params.ids || '').split(','), (id) => {
     return userDao.caseObjectId(id)
   })
@@ -167,4 +172,12 @@ router.put('/batch/:ids', async (cxt) => {
   cxt.body = {}
 })
 
+/*
+* 修改密码
+* */
+router.put('/password', async (cxt) => {
+  const {password = null} = cxt.request.body
+  await userDao.update({_id: cxt.state.user._id}, {password})
+  cxt.body = {}
+})
 module.exports = router
