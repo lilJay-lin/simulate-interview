@@ -24,7 +24,7 @@ class BaseDao {
   }
   async batch (queryParam, set = {}) {
     const model = this.model()
-    let docs = await model.update(queryParam, {$set: set}, { multi: true }).exec()
+    let docs = await model.update(queryParam, {$set: set}, { runValidators: true, multi: true }).exec()
     return docs
   }
   async update (queryParam, doc = {}) {
@@ -32,7 +32,7 @@ class BaseDao {
     if (doc._id) {
       delete doc._id
     }
-    let docs = await model.update(queryParam, doc, { multi: true }).exec()
+    let docs = await model.update(queryParam, {$set: doc}, { runValidators: true, multi: true }).exec()
     return docs
   }
   async find (queryParam) {

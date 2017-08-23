@@ -125,4 +125,25 @@ UserSchema.pre('save', function (next) {
   })
 })
 
+UserSchema.pre('update', function (next) {
+  let password = this._update.$set.password
+  if (!password) {
+    return next()
+  }
+  crypto.randomBytes(16, (err, buf) => {
+    if (err) {
+      return next(err)
+    }
+    let salt = new Buffer(buf).toString('hex')
+    crypto.pbkdf2(password, salt, LITERAL, LENGTH, SHA, (err, key) => {
+      if (err) {
+        return next(err)
+      }
+      this._update.$set.salt = salt
+      this._update.$set.password = key.toString('hex')
+      next()
+    })
+  })
+})
+
 module.exports = UserSchema

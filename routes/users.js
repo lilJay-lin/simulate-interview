@@ -118,6 +118,15 @@ router.get('/:user', async (cxt) => {
 })
 
 /*
+ * 修改密码
+ * */
+router.put('/password', async (cxt) => {
+  const {password = null} = cxt.request.body
+  await userDao.update({_id: cxt.state.user._id}, {password})
+  cxt.body = {}
+})
+
+/*
  * 非查询功能权限限制
  * */
 router.use(auth([CODES.manageUser]))
@@ -172,12 +181,4 @@ router.put('/batch/:ids', async (cxt) => {
   cxt.body = {}
 })
 
-/*
-* 修改密码
-* */
-router.put('/password', async (cxt) => {
-  const {password = null} = cxt.request.body
-  await userDao.update({_id: cxt.state.user._id}, {password})
-  cxt.body = {}
-})
 module.exports = router

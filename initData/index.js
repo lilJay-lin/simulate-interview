@@ -4,13 +4,14 @@
 const userDao = new (require('../dao/user'))
 const roleDao = new (require('../dao/role'))
 const permissionDao = new (require('../dao/permission'))
+const CODES = require('../authorization/req_auth').CODES
 module.exports = async createBaseData => {
   try{
     let user = await userDao.find({loginName: 'liljay'})
     if (user.length === 0) {
       let permission = await permissionDao.add({
         name: '超级权限',
-        code: 'super',
+        code: CODES.super,
         description: '系统超级管理员，拥有全部系统权限'
       })
       let role = await roleDao.add({
