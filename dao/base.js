@@ -24,7 +24,7 @@ class BaseDao {
   }
   async batch (queryParam, set = {}) {
     const model = this.model()
-    let docs = await model.update(queryParam, {$set: set}, {multi: true, runValidators: true, context: 'query'}).exec()
+    const docs = await model.update(queryParam, {$set: set}, {multi: true, runValidators: true, context: 'query'}).exec()
     return docs
   }
   async update (queryParam, doc = {}) {
@@ -32,7 +32,7 @@ class BaseDao {
     if (doc._id) {
       delete doc._id
     }
-    let docs = await model.update(queryParam, doc, {multi: true, runValidators: true, context: 'query'}).exec()
+    const docs = await model.update(queryParam, doc, {multi: true, runValidators: true, context: 'query'}).exec()
     return docs
   }
   async find (queryParam) {
@@ -40,7 +40,7 @@ class BaseDao {
     if (queryParam.status === undefined) {
       queryParam.status = '1'
     }
-    let docs = await model.find(queryParam).exec()
+    const docs = await model.find(queryParam).exec()
     return docs
   }
   async findPopulate ({queryParam = {}, populate = ''}) {
@@ -48,23 +48,17 @@ class BaseDao {
     if (queryParam.status === undefined) {
       queryParam.status = '1'
     }
-    let docs = await model.find(queryParam).populate(populate).exec()
-    return docs
-  }
-  async findPopulates ({queryParam = {}, populates = []}) {
-    const model = this.model()
-    if (queryParam.status === undefined) {
-      queryParam.status = '1'
+    const query = model.find(queryParam).populate(populate)
+    if (_.isArray(populate)) {
+      _.each(populate, (p) => {
+        query.populate(p)
+      })
     }
-    const query = model.find(queryParam)
-    _.each(populates, (p) => {
-      query.populate(p)
-    })
-    let docs = await query.exec()
+    const docs = await query.exec()
     return docs
   }
   async pageQuery ({page = 1, pageSize = 10, populate = '', queryParam = {}, sortParam = '-createdAt'}) {
-    let model = this.model()
+    const model = this.model()
     if (!model) {
       return {
         records: [],
@@ -78,8 +72,14 @@ class BaseDao {
     page = parseInt(page, 10)
     pageSize = parseInt(pageSize, 10)
     const start = (page - 1) * pageSize
-    let rows = await model.count(queryParam).exec()
-    let records = await model.find(queryParam).skip(start).limit(pageSize).populate(populate).sort((sortParam)).exec()
+    const rows = await model.count(queryParam).exec()
+    const query = model.find(queryParam).skip(start).limit(pageSize)
+    if (_.isArray(populate)) {
+      _.each(populate, (p) => {
+        query.populate(p)
+      })
+    }
+    let records = await query.sort((sortParam)).exec()
     records = _.map(records, (record) => {
       return record.toObject()
     })

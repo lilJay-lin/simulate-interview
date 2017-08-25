@@ -12,11 +12,11 @@ const CODES = require('../authorization/req_auth').CODES
 
 router.param('product', async (id, cxt, next) => {
   const status = cxt.query['status'] == 0 ? 0 : 1
-  let products = await productDao.findPopulates({
+  let products = await productDao.findPopulate({
     queryParam: {
       _id: productDao.caseObjectId(id), status
     },
-    populates: [
+    populate: [
       {
         path: 'type',
         select: 'name',
@@ -55,7 +55,20 @@ router.get('/', async (cxt) => {
   if (name !== undefined) {
     queryParam.name = {$regex: decodeURIComponent(name)}
   }
-  let list = await productDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam})
+  let list = await productDao.pageQuery({pageSize: query.pageSize, page: query.page, queryParam, populate: [
+    {
+      path: 'type',
+      match: {status: '1'}
+    },
+    {
+      path: 'factory',
+      match: {status: '1'}
+    },
+    {
+      path: 'brand',
+      match: {status: '1'}
+    }
+  ]})
   cxt.body = list
 })
 
