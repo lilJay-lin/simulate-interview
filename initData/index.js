@@ -23,6 +23,7 @@ module.exports = async createBaseData => {
         userName: '林小杰',
         loginName: 'liljay',
         password: '8293526@',
+        avatar: '/avatar/avatar-1503566048992.jpg',
         description: '系统管理员',
         email: 'lin_xjie@foxmail.com',
         roles: [role._id]

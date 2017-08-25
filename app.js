@@ -20,7 +20,7 @@ const initData = require('./initData')
 app.use(mongoose({
   host: '127.0.0.1',
   port: 27017,
-  database: 'simulate',
+  database: 'shop',
   schemas: path.join(__dirname, 'schemas'),
   opt: {
     user: 'xmb',

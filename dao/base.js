@@ -51,6 +51,18 @@ class BaseDao {
     let docs = await model.find(queryParam).populate(populate).exec()
     return docs
   }
+  async findPopulates ({queryParam = {}, populates = []}) {
+    const model = this.model()
+    if (queryParam.status === undefined) {
+      queryParam.status = '1'
+    }
+    const query = model.find(queryParam)
+    _.each(populates, (p) => {
+      query.populate(p)
+    })
+    let docs = await query.exec()
+    return docs
+  }
   async pageQuery ({page = 1, pageSize = 10, populate = '', queryParam = {}, sortParam = '-createdAt'}) {
     let model = this.model()
     if (!model) {
